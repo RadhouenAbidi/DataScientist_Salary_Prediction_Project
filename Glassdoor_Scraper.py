@@ -27,17 +27,39 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_t):
     url = 'https://www.glassdoor.com/Job/jobs.htm?suggestCount=0&suggestChosen=false&clickSource=searchBtn&typedKeyword="'+ keyword +'"&sc.keyword="'+ keyword +'"&minSalary=0&includeNoSalaryJobs=false'
     driver.get(url)
     jobs = []
+    
+    #Test for the "Sign Up" prompt and get rid of it.
+    try:
+            driver.find_element_by_class_name("selected").click()
+    except ElementClickInterceptedException:
+            pass
+
+    time.sleep(5)
+
+    try:
+            driver.find_element_by_css_selector('[alt="Close"]').click()  #clicking to the X.
+            print ('x out worked')
+    except NoSuchElementException:
+            print ('x out failed')
+            pass
+    
+    time.sleep(5)
+        
+        #Here we won't include the jobs without salaries 
+    try: 
+            driver.find_element_by_id("filter_minSalary").click()        
+            driver.find_element_by_xpath('//button[@class="applybutton gd-btn gd-btn-link gradient gd-btn-2 gd-btn-sm"]').click()
+            print('apply passed')
+    except NoSuchElementException:
+            print ('apply did not passed')
+            pass
 
     while len(jobs) < num_jobs:  #If true, should be still looking for new jobs.
 
         #Let the page load. Change this number based on your internet speed.
         #Or, wait until the webpage is loaded, instead of hardcoding it.
 
-        #Test for the "Sign Up" prompt and get rid of it.
-        try:
-            driver.find_element_by_class_name("selected").click()
-        except ElementClickInterceptedException:
-            pass
+        print(len(jobs))
 
         time.sleep(5)
 
@@ -48,17 +70,7 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_t):
             print ('x out failed')
             pass
         
-        time.sleep(10)
-        
-        try: 
-            driver.find_element_by_id("filter_minSalary").click()        
-            driver.find_element_by_xpath('//button[@class="applybutton gd-btn gd-btn-link gradient gd-btn-2 gd-btn-sm"]').click()
-            print('apply passed')
-        except NoSuchElementException:
-            print ('apply did not passed')
-            pass
-        
-        time.sleep(10)
+
         
         #Going through each job in this page
         job_buttons = driver.find_elements_by_class_name("jl")  #jl for Job Listing. These are the buttons we're going to click.
@@ -188,16 +200,18 @@ def get_jobs(keyword, num_jobs, verbose, path, slp_t):
             "Revenue" : revenue,
             "Competitors" : competitors})
             #add job to jobs
-
+        time.sleep(2)
         #Clicking on the "next page" button
         try:
             driver.find_element_by_xpath('.//li[@class="next"]//a').click()
+            print('scrapping stoped')
+            
         except NoSuchElementException:
             print("Scraping terminated before reaching target number of jobs. Needed {}, got {}.".format(num_jobs, len(jobs)))
             break
-
+       
    
-        return pd.DataFrame(jobs)  #This line converts the dictionary object into a pandas DataFrame.
+    return pd.DataFrame(jobs)  #This line converts the dictionary object into a pandas DataFrame.
 
 
 #This line will open a new chrome window and start the scraping.
