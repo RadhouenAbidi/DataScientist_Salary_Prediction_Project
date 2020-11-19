@@ -13,6 +13,3 @@ path="C:/Users/Radhouen/Documents/GitHub/DataScientist_Salary_Prediction_Project
 df=gs.get_jobs('data scientist', 1000, False, path, 20)
 
 
-df2=pd.read_csv("C:/Users/Radhouen/Documents/GitHub/DataScientist_Salary_Prediction_Project/Glassdoor_Jobs_Srapped.csv")
-
-pd.DataFrame(df2)
